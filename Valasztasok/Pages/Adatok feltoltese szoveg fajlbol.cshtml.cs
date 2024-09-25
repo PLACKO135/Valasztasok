@@ -18,11 +18,11 @@ namespace Valasztasok.Pages
         public void OnGet()
         {
         }
-        public async Task<IActionResult> OnPostAsync() 
+        public async Task<IActionResult> OnPostAsync()
         {
-            var UploadFilePath = Path.Combine(Environment.ContentRootPath,"uploads",UploadFile.FileName);
+            var UploadFilePath = Path.Combine(Environment.ContentRootPath, "uploads", UploadFile.FileName);
 
-            using (var stream = new FileStream(UploadFilePath, FileMode.Create)) 
+            using (var stream = new FileStream(UploadFilePath, FileMode.Create))
             {
                 await UploadFile.CopyToAsync(stream);
             }
@@ -34,15 +34,25 @@ namespace Valasztasok.Pages
                 var elemek = line.Split(" ");
                 Jelolt ujJelolt = new Jelolt();
                 Part ujPart = new Part();
+                if (!Context.Partok.Select(x => x.Rovid_nev).Contains(elemek[4]))
+                {
+                    ujPart = new();
+                    ujPart.Rovid_nev = elemek[4];
+                    Context.Partok.Add(ujPart);
+                }
+                else
+                {
+                    ujPart= Context.Partok.Where(x => x.Rovid_nev == elemek[4]).First();
+                }
                 ujJelolt.Kerulet = int.Parse(elemek[0]);
-                ujJelolt.Szavazatszam=int.Parse(elemek[1]);
-                ujJelolt.Nev = elemek[2] +" "+elemek[3];
-                ujPart.Rovid_nev= elemek[4];
+                ujJelolt.Szavazatszam = int.Parse(elemek[1]);
+                ujJelolt.Nev = elemek[2] + " " + elemek[3];
+                ujPart.Rovid_nev = elemek[4];
                 Context.Jeloltek.Add(ujJelolt);
                 Context.Partok.Add(ujPart);
             }
             sr.Close();
-                return Page();
+            return Page();
         }
     }
 }
